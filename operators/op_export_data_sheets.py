@@ -13,6 +13,57 @@ from ..operators.op_render_sprite_animation import get_action_frame_count
 def make_mono_source(width, height, pos_x, pos_y):
     return str(pos_x) + " " + str(pos_y) + " " + str(width) + " " + str(height)
 
+class MK_SPRITES_OP_export_bevy_image_json(bpy.types.Operator):
+    """open_action_menu"""
+    bl_idname = "mk_sprites.export_bevy_image_json"
+    bl_label = "Add Action"
+    bl_options = {'REGISTER'}
+
+    filepath: bpy.props.StringProperty(name="filepath")
+
+    def execute(self, context):
+        mk_render_props = context.scene.mk_sprites_render_panel_properties
+        export_props = context.scene.mk_sprites_export_panel_properties
+        frame_step = context.scene.frame_step
+        active_image = export_props.image_props[export_props.active_image]
+
+        if active_image.image is None:
+            return {'FINISHED'}
+
+        image_width = active_image.image.size[0]
+        image_height = active_image.image.size[1]
+
+        animations = {}
+        n = 0
+        for obj_rot in range(active_image.object_angles):
+            for action_obj in active_image.object_actions:
+                if action_obj is None or action_obj.action is None:
+                    continue
+
+                action_name = action_obj.action.name + "_" + str(obj_rot)
+                animations[action_name] = {
+                    "mode": "Repeat",
+                    "fps": context.scene.render.fps,
+                    "size_x": mk_render_props.resolution_x,
+                    "size_y": mk_render_props.resolution_y,
+                    "frames": list(range(get_action_frame_count(action_obj.action, frame_step))),
+                    "row": n
+                }
+                n += 1
+
+        img_path = os.path.splitext(self.filepath)
+
+        output = {
+            "width": image_width,
+            "height": image_height,
+            "animations": animations
+        }
+
+        with open(img_path[0] + ".json", 'w') as f:
+            json.dump(output, f, indent=2, sort_keys=True)
+
+        return {'FINISHED'}
+
 class MK_SPRITES_OP_export_image_json(bpy.types.Operator):
     """open_action_menu"""
     bl_idname = "mk_sprites.export_image_json"
@@ -24,6 +75,7 @@ class MK_SPRITES_OP_export_image_json(bpy.types.Operator):
     def execute(self, context):
         mk_render_props = context.scene.mk_sprites_render_panel_properties
         export_props = context.scene.mk_sprites_export_panel_properties
+        frame_step = context.scene.frame_step
         active_image = export_props.image_props[export_props.active_image]
 
         if active_image.image == None:
@@ -40,7 +92,7 @@ class MK_SPRITES_OP_export_image_json(bpy.types.Operator):
                     continue
 
                 item = {}
-                item["frames"] = get_action_frame_count(action_obj.action)
+                item["frames"] = get_action_frame_count(action_obj.action, frame_step)
                 item["framerate"] = context.scene.render.fps
                 item["loop"] = True
                 item["name"] = action_obj.action.name + "_" + str(obj_rot)
@@ -62,6 +114,7 @@ class MK_SPRITES_OP_export_image_json(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class MK_SPRITES_OP_export_image_xml(bpy.types.Operator):
     """open_action_menu"""
     bl_idname = "mk_sprites.export_image_xml"
@@ -74,6 +127,7 @@ class MK_SPRITES_OP_export_image_xml(bpy.types.Operator):
     def execute(self, context):
         mk_render_props = context.scene.mk_sprites_render_panel_properties
         export_props = context.scene.mk_sprites_export_panel_properties
+        frame_step = context.scene.frame_step
         active_image = export_props.image_props[export_props.active_image]
 
         # start tree
@@ -100,7 +154,7 @@ class MK_SPRITES_OP_export_image_xml(bpy.types.Operator):
 
                 item = xml.SubElement(animations, "Item")
 
-                xml.SubElement(item, "frames").text = str(get_action_frame_count(action_obj.action))
+                xml.SubElement(item, "frames").text = str(get_action_frame_count(action_obj.action, frame_step))
                 xml.SubElement(item, "framerate").text = str(context.scene.render.fps)
                 xml.SubElement(item, "loop").text = "True"
                 xml.SubElement(item, "name").text = action_obj.action.name + "_" + str(obj_rot)

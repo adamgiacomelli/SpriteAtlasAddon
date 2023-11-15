@@ -10,10 +10,10 @@ def get_scene_framerate(context):
     frame_start = context.scene.frame_start
     frame_end = context.scene.frame_end
 
-def get_action_frame_count(action):
+def get_action_frame_count(action, step=1):
     frame_start = int(action.frame_range[0])
     frame_end = int(action.frame_range[1])
-    return frame_end - frame_start
+    return ((frame_end - frame_start) // step) + 1
 
 class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
     """render subject to sprite atlass"""

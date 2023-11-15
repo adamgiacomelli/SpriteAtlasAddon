@@ -10,7 +10,7 @@ from .ui_subject_panel import MK_SPRITES_action_item
 from ..utils.xmlutils import GetMonoXMLHeader, XMLIndent, ExportXml
 from ..utils.tileutils import GetTilePos
 from ..operators.op_render_sprite_animation import get_action_frame_count
-from ..operators.op_export_data_sheets import MK_SPRITES_OP_export_image_json, MK_SPRITES_OP_export_image_xml
+from ..operators.op_export_data_sheets import MK_SPRITES_OP_export_image_json, MK_SPRITES_OP_export_image_xml, MK_SPRITES_OP_export_bevy_image_json
 
 def update_active_image(self, context):
     export_props = context.scene.mk_sprites_export_panel_properties
@@ -69,6 +69,11 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
         name="Export Image",
         description="Example Tooltip",
         default=True,
+    )
+    export_bevy_json: BoolProperty(
+        name="Export Bevy JSON",
+        description="Example Tooltip",
+        default=False,
     )
     export_json: BoolProperty(
         name="Export JSON",
@@ -212,6 +217,7 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
             col.template_image_settings(context.scene.render.image_settings, color_management=False)
 
         col.prop(self, "export_json")
+        col.prop(self, "export_bevy_json")
         #col.prop(self, "export_asesprite json")
 
         col.prop(self, "export_xml")
@@ -230,6 +236,9 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
 
         if self.export_json:
             bpy.ops.mk_sprites.export_image_json(filepath = self.filepath)
+
+        if self.export_bevy_json:
+            bpy.ops.mk_sprites.export_bevy_image_json(filepath = self.filepath)
 
         if self.export_xml or self.export_mono:
             bpy.ops.mk_sprites.export_image_xml(filepath = self.filepath, use_mono = self.export_mono)

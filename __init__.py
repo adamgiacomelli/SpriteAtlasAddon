@@ -19,6 +19,7 @@ bl_info = {
 classes = (
     op_render_sprite_animation.MK_SPRITES_OP_render_sprite_animation,
     op_export_data_sheets.MK_SPRITES_OP_export_image_json,
+    op_export_data_sheets.MK_SPRITES_OP_export_bevy_image_json,
     op_export_data_sheets.MK_SPRITES_OP_export_image_xml,
     ui_subject_panel.MK_SPRITES_OP_sprite_action_add,
     ui_subject_panel.MK_SPRITES_OP_sprite_action_remove,
