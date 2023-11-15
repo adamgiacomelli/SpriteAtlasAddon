@@ -43,6 +43,7 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
             rotations = 1
 
         file_type_ext = context.scene.render.file_extension
+        frame_step = context.scene.frame_step
 
         for i in range(rotations):
             img_path = os.path.join(GetTempFolder(), str(self.n))
@@ -53,7 +54,7 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
             if frames > 0:
                 bpy.ops.render.render( animation = True)
 
-                for f in range(first_frame, first_frame + frames + 1):
+                for f in range(first_frame, first_frame + frames + 1, frame_step):
                     renderpaths.append(img_path + str(f).zfill(4) + file_type_ext)
 
             else:
@@ -73,6 +74,7 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         for anim in mk_subject_props.obj_actions:
             frame_start = int(anim.action.frame_range[0])
             frame_end = int(anim.action.frame_range[1])
+            frame_step = context.scene.frame_step
             frame_range = frame_end - frame_start
 
             context.scene.frame_start = frame_start
