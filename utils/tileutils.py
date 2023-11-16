@@ -11,50 +11,60 @@ def AutoImageSize(width, height, count):
     lin_len_y = height * sqr_count
     return (lin_len_x, lin_len_y)
 
-def PasteImage(target, source, posx, posy, image_height):
+def GetTilePos(tile_width, tile_height, sheet_width, sheet_height, index):
+    tiles_per_row = sheet_width // tile_width
+    posX = (index % tiles_per_row) * tile_width
+    posY = (index // tiles_per_row) * tile_height
+    return (posX, posY)
+
+def PasteImage(target, source, posx, posy, spritesheet_height):
     target_pixels = list(target.pixels)
     source_pixels = list(source.pixels)
-    width  = source.size[0]
+    width = source.size[0]
     height = source.size[1]
 
-    posy = image_height - posy - height
+    # Adjust posy to start from the bottom of the target image
+    posy = spritesheet_height - posy - height
 
-    for Y in range(0, height):
-        for X in range(0, width):
-            sp = int(X + (Y * width))
-            tp = int((X + posx)  + ((Y + posy) * target.size[0]))
+    if posy < 0 or posx + width > target.size[0] or posy + height > target.size[1]:
+        raise ValueError("Attempting to paste image out of the bounds of the target spritesheet.")
 
-            sp *= source.channels
-            tp *= target.channels
+    for Y in range(height):
+        for X in range(width):
+            sp = (X + Y * width) * source.channels
+            tp = ((X + posx) + (Y + posy) * target.size[0]) * target.channels
 
-            for C in range(0, min(source.channels, target.channels)):
+            for C in range(min(source.channels, target.channels)):
                 target_pixels[tp + C] = source_pixels[sp + C]
 
-    target.pixels[:] = target_pixels
+    target.pixels = target_pixels
     target.update()
-
-def GetTilePos(width, height, image_width, image_height, i):
-    posX = (i * width) % image_width
-    posY = int((i * width) / image_height) * height
-    return (posX, posY)
 
 def TilePathsIntoImage(spritesheet_name_string, image_path_list, width, height):
     # create spritesheet image
     spritesheet = None
 
+
+    print("Building pritesheet: %s" % spritesheet_name_string)
     # check if sprite sheet exists
     if spritesheet_name_string in bpy.data.images:
         spritesheet = bpy.data.images[spritesheet_name_string]
 
-        if spritesheet.resolution[0] != width or spritesheet.resolution[1] != width:
+        print("Existing pritesheet res: %s %s" % (spritesheet.resolution[0],spritesheet.resolution[1]))
+        if spritesheet.resolution[0] != width or spritesheet.resolution[1] != height:
+            print("Spritesheet resolution changed, re-creating") 
             bpy.data.images.remove(spritesheet)
             spritesheet = bpy.data.images.new(spritesheet_name_string, width, height, alpha=True)
 
     else:
         # else create it
+
+        print("Creating new spritesheet: %s" % spritesheet_name_string)
         spritesheet = bpy.data.images.new(spritesheet_name_string, width, height, alpha=True)
 
     # load sprites and append into sheet
+
+    print("Spritesheet res: %s %s" % (spritesheet.resolution[0],spritesheet.resolution[1]))
     for i in range(len(image_path_list)):
 
         # locals
@@ -68,7 +78,7 @@ def TilePathsIntoImage(spritesheet_name_string, image_path_list, width, height):
             raise NameError("Cannot load image %s" % path)
 
         posX, posY = GetTilePos(img.size[0], img.size[1], spritesheet.size[0], spritesheet.size[1], i)
-        PasteImage(spritesheet, img, posX, posY, width)
+        PasteImage(spritesheet, img, posX, posY, spritesheet.size[1])
 
         bpy.data.images.remove(img)
 
