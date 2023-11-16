@@ -18,7 +18,8 @@ class MK_SPRITES_PT_render_panel_properties(bpy.types.PropertyGroup):
             ('32', '32x32', "Use z value from shape geometry if exists", 32),
             ('50', '50x50', "Use z value from shape geometry if exists", 50),
             ('64', '64x64', "Extract z elevation value from an attribute field", 64),
-            ('128', '128x128', "Get z elevation value from an existing ground mesh", 128)
+            ('128', '128x128', "Get z elevation value from an existing ground mesh", 128),
+            ('256', '256x256', "Get z elevation value from an existing ground mesh", 256)
         ],
         update = update_default_render_size,
         default='32'

@@ -7,8 +7,7 @@ from bpy.types import PropertyGroup
 from bpy.props import PointerProperty, StringProperty, IntProperty, BoolProperty, CollectionProperty, EnumProperty
 
 from ..utils.xmlutils import GetMonoXMLHeader, GetXMLHeader, XMLIndent, ExportXml
-from ..utils.tileutils import GetTilePos
-from ..operators.op_render_sprite_animation import get_action_frame_count
+from ..utils.helpers import GetTilePos, GetActionFrameCount
 
 def make_mono_source(width, height, pos_x, pos_y):
     return str(pos_x) + " " + str(pos_y) + " " + str(width) + " " + str(height)
@@ -46,7 +45,7 @@ class MK_SPRITES_OP_export_bevy_image_json(bpy.types.Operator):
                     "fps": context.scene.render.fps,
                     "size_x": mk_render_props.resolution_x,
                     "size_y": mk_render_props.resolution_y,
-                    "frames": list(range(get_action_frame_count(action_obj.action, frame_step))),
+                    "frames": list(range(GetActionFrameCount(action_obj.action, frame_step))),
                     "row": n
                 }
                 n += 1
@@ -92,7 +91,7 @@ class MK_SPRITES_OP_export_image_json(bpy.types.Operator):
                     continue
 
                 item = {}
-                item["frames"] = get_action_frame_count(action_obj.action, frame_step)
+                item["frames"] = GetActionFrameCount(action_obj.action, frame_step)
                 item["framerate"] = context.scene.render.fps
                 item["loop"] = True
                 item["name"] = action_obj.action.name + "_" + str(obj_rot)
@@ -154,7 +153,7 @@ class MK_SPRITES_OP_export_image_xml(bpy.types.Operator):
 
                 item = xml.SubElement(animations, "Item")
 
-                xml.SubElement(item, "frames").text = str(get_action_frame_count(action_obj.action, frame_step))
+                xml.SubElement(item, "frames").text = str(GetActionFrameCount(action_obj.action, frame_step))
                 xml.SubElement(item, "framerate").text = str(context.scene.render.fps)
                 xml.SubElement(item, "loop").text = "True"
                 xml.SubElement(item, "name").text = action_obj.action.name + "_" + str(obj_rot)

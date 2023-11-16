@@ -4,16 +4,12 @@ import math
 import mathutils
 
 from ..utils.ioutils import CreateTempFolder, GetTempFolder, ClearTempFolder
-from ..utils.tileutils import TilePathsIntoImage, AutoImageSize
+from ..utils.helpers import AutoImageSize
+from ..utils.tileutils import TilePathsIntoImage 
 
 def get_scene_framerate(context):
     frame_start = context.scene.frame_start
     frame_end = context.scene.frame_end
-
-def get_action_frame_count(action, step=1):
-    frame_start = int(action.frame_range[0])
-    frame_end = int(action.frame_range[1])
-    return ((frame_end - frame_start) // step) + 1
 
 class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
     """render subject to sprite atlass"""
@@ -88,6 +84,7 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         mk_export_props = scene.mk_sprites_export_panel_properties
         mk_render_props = scene.mk_sprites_render_panel_properties
         mk_subject_props = scene.mk_sprites_subject_panel_properties
+        frame_step = scene.frame_step
 
         # set up folders to render into
         old_path = bpy.context.scene.render.filepath
@@ -108,11 +105,15 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         # once all images rendered
         size = (mk_render_props.image_resolution_x, mk_render_props.image_resolution_y)
 
+        print("Auto resolution: ", mk_render_props.auto_resolution, mk_render_props.resolution_x, mk_render_props.resolution_y, mk_subject_props.rotations)
+        print("Auto resolution: ",mk_subject_props.obj_actions)
         if mk_render_props.auto_resolution:
             size = AutoImageSize(
                 mk_render_props.resolution_x,
                 mk_render_props.resolution_y,
-                len(renderpaths)
+                mk_subject_props.obj_actions,
+                mk_subject_props.rotations,
+                frame_step
             )
             print(size)
 

@@ -9,7 +9,6 @@ from .ui_subject_panel import MK_SPRITES_action_item
 
 from ..utils.xmlutils import GetMonoXMLHeader, XMLIndent, ExportXml
 from ..utils.tileutils import GetTilePos
-from ..operators.op_render_sprite_animation import get_action_frame_count
 from ..operators.op_export_data_sheets import MK_SPRITES_OP_export_image_json, MK_SPRITES_OP_export_image_xml, MK_SPRITES_OP_export_bevy_image_json
 
 def update_active_image(self, context):

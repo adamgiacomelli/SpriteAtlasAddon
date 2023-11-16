@@ -1,21 +1,10 @@
 import bpy
 import os
 import math
+from .helpers import GetActionFrameCount, GetTilePos
 
 def CeilToMultiple(number, multiple):
     return multiple * math.ceil(float(number) / float(multiple))
-
-def AutoImageSize(width, height, count):
-    sqr_count =  math.ceil(math.sqrt(count))
-    lin_len_x = width * sqr_count
-    lin_len_y = height * sqr_count
-    return (lin_len_x, lin_len_y)
-
-def GetTilePos(tile_width, tile_height, sheet_width, sheet_height, index):
-    tiles_per_row = sheet_width // tile_width
-    posX = (index % tiles_per_row) * tile_width
-    posY = (index // tiles_per_row) * tile_height
-    return (posX, posY)
 
 def PasteImage(target, source, posx, posy, spritesheet_height):
     target_pixels = list(target.pixels)
