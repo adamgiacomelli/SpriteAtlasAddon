@@ -16,6 +16,8 @@ def PasteImage(target, source, posx, posy, spritesheet_height):
     posy = spritesheet_height - posy - height
 
     if posy < 0 or posx + width > target.size[0] or posy + height > target.size[1]:
+        print(spritesheet_height, height)
+        print(posy, posx)
         raise ValueError("Attempting to paste image out of the bounds of the target spritesheet.")
 
     for Y in range(height):
@@ -48,12 +50,12 @@ def TilePathsIntoImage(spritesheet_name_string, image_path_list, width, height):
     else:
         # else create it
 
-        print("Creating new spritesheet: %s" % spritesheet_name_string)
+        print("Creating new spritesheet: %s (%s %s)" % (spritesheet_name_string, width, height))
         spritesheet = bpy.data.images.new(spritesheet_name_string, width, height, alpha=True)
 
     # load sprites and append into sheet
 
-    print("Spritesheet res: %s %s" % (spritesheet.resolution[0],spritesheet.resolution[1]))
+    print("Spritesheet res: %s %s size(%s, %s)" % (spritesheet.resolution[0],spritesheet.resolution[1], spritesheet.size[0], spritesheet.size[1]))
     for i in range(len(image_path_list)):
 
         # locals

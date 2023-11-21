@@ -17,6 +17,6 @@ def AutoImageSize(frame_width, frame_height, animations, rotations, step=1):
     # Calculate the width as the product of the longest animation length and frame width
     sheet_width = frame_width * max_frames
     # Calculate the height as the product of the number of rotations and frame height
-    sheet_height = frame_height * rotations
+    sheet_height = frame_height * rotations * len(animations)
 
     return (sheet_width, sheet_height)

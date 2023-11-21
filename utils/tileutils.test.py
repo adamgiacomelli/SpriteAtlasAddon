@@ -14,7 +14,8 @@ class TestAutoImageSize(unittest.TestCase):
             ((32, 48, [{'action': MockAction((0, 4))}], 4, 1), (160, 192)),
             ((50, 50, [{'action': MockAction((0, -1))}], 3, 1), (0, 150)),
             ((100, 100, [{'action': MockAction((0, 2))}], 0, 1), (300, 0)),
-            ((256, 256, [{'action': MockAction((0, 40))}], 4, 4), (2816, 1024))
+            ((256, 256, [{'action': MockAction((0, 40))}], 4, 4), (2816, 1024)),
+            ((256, 256, [{'action': MockAction((0, 40))}, {'action': MockAction((0, 50))}, {'action': MockAction((0, 40))}], 4, 4), (3200, 3072))
         ]
 
         for inputs, expected in test_cases:
