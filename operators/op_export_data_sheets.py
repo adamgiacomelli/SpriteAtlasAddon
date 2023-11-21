@@ -58,7 +58,7 @@ class MK_SPRITES_OP_export_bevy_image_json(bpy.types.Operator):
             "animations": animations
         }
 
-        with open(img_path[0] + ".json", 'w') as f:
+        with open(img_path[0] + "animation_set.json", 'w') as f:
             json.dump(output, f, indent=2, sort_keys=True)
 
         return {'FINISHED'}

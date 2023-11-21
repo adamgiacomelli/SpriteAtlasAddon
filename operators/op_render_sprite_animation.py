@@ -1,21 +1,25 @@
-import os
-import bpy
 import math
+import os
+
+import bpy
 import mathutils
 
-from ..utils.ioutils import CreateTempFolder, GetTempFolder, ClearTempFolder
 from ..utils.helpers import AutoImageSize
-from ..utils.tileutils import TilePathsIntoImage 
+from ..utils.ioutils import ClearTempFolder, CreateTempFolder, GetTempFolder
+from ..utils.tileutils import TilePathsIntoImage
+
 
 def get_scene_framerate(context):
     frame_start = context.scene.frame_start
     frame_end = context.scene.frame_end
 
+
 class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
     """render subject to sprite atlass"""
+
     bl_idname = "mk_sprites.render_sprite_animation"
     bl_label = "Render"
-    bl_options = {'REGISTER'}
+    bl_options = {"REGISTER"}
 
     subject_rotations: bpy.props.IntProperty(default=0)
     use_animations: bpy.props.BoolProperty(default=False)
@@ -31,12 +35,28 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         else:
             self.render_frames(context, renderpaths, 0, 0, subject)
 
-    def render_frames(self, context, renderpaths, first_frame = 0, frames = 0, subject = None):
+    def render_frames(
+        self, context, renderpaths, first_frame=0, frames=0, subject=None
+    ):
         arc = (math.pi * 2) / self.subject_rotations
 
         rotations = max(1, self.subject_rotations)
-        if (subject == None):
+        if subject == None:
             rotations = 1
+
+        # Find the "CameraTrack" child object
+        camera_track = None
+        if subject:
+            for child in subject.children:
+                if child.name == "CameraTrack":
+                    camera_track = child
+                    break
+
+        if not camera_track:
+            self.report(
+                {"ERROR"}, "CameraTrack object not found as a child of the subject."
+            )
+            return {"CANCELLED"}
 
         file_type_ext = context.scene.render.file_extension
         frame_step = context.scene.frame_step
@@ -48,18 +68,19 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
             context.scene.render.filepath = img_path
 
             if frames > 0:
-                bpy.ops.render.render( animation = True)
+                bpy.ops.render.render(animation=True)
 
                 for f in range(first_frame, first_frame + frames + 1, frame_step):
                     renderpaths.append(img_path + str(f).zfill(4) + file_type_ext)
 
             else:
                 renderpaths.append(img_path + file_type_ext)
-                bpy.ops.render.render( animation=False, write_still=True)
+                bpy.ops.render.render(animation=False, write_still=True)
 
-            # only rotate if the operator has a subject
-            if subject and self.subject_rotations > 0:
-                subject.delta_rotation_euler[2] = subject.delta_rotation_euler[2] + arc
+            # Apply rotation to the "CameraTrack" object instead of the subject
+            if camera_track and self.subject_rotations > 0:
+                print("Rotating by arc:", arc)
+                camera_track.rotation_euler[2] += arc
 
     # render the animation or sprites for each animation
     # these animations are stored in scene.mk_sprites_subject_panel_properties
@@ -89,7 +110,7 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         # set up folders to render into
         old_path = bpy.context.scene.render.filepath
         if not CreateTempFolder():
-            return {'FINISHED'}
+            return {"FINISHED"}
         bpy.context.scene.render.filepath = GetTempFolder()
 
         # set render settings
@@ -105,15 +126,21 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         # once all images rendered
         size = (mk_render_props.image_resolution_x, mk_render_props.image_resolution_y)
 
-        print("Auto resolution: ", mk_render_props.auto_resolution, mk_render_props.resolution_x, mk_render_props.resolution_y, mk_subject_props.rotations)
-        print("Auto resolution: ",mk_subject_props.obj_actions)
+        print(
+            "Auto resolution: ",
+            mk_render_props.auto_resolution,
+            mk_render_props.resolution_x,
+            mk_render_props.resolution_y,
+            mk_subject_props.rotations,
+        )
+        print("Auto resolution: ", mk_subject_props.obj_actions)
         if mk_render_props.auto_resolution:
             size = AutoImageSize(
                 mk_render_props.resolution_x,
                 mk_render_props.resolution_y,
                 mk_subject_props.obj_actions,
                 mk_subject_props.rotations,
-                frame_step
+                frame_step,
             )
             print(size)
 
@@ -138,4 +165,4 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
         context.scene.render.resolution_y = old_y
 
         ClearTempFolder()
-        return {'FINISHED'}
+        return {"FINISHED"}
