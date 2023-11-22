@@ -96,6 +96,14 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
             
             for modifier in obj.modifiers:
                 if modifier.type == 'CLOTH':
+                    # Clear previous bake
+                    
+                    # Keep defined modifier simulation range
+                    # modifier.point_cache.frame_start = context.scene.frame_start
+                    # modifier.point_cache.frame_end = context.scene.frame_end
+                    bpy.ops.ptcache.free_bake_all()
+                    print(f"Cleared previous bake for: {obj.name}")
+
                     print(f"Baking cloth simulation for: {obj.name}")
                     # Override the context for baking
                     override = context.copy()
@@ -121,8 +129,8 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
 
         # render each animation
         for anim in mk_subject_props.obj_actions:
-            # Bake any physics simulations etc.
-            self.prepare_for_rendering(context, subject)
+
+            print(f"Rendering animation: {anim.action.name}")
 
             frame_start = int(anim.action.frame_range[0])
             frame_end = int(anim.action.frame_range[1])
@@ -133,6 +141,9 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
             context.scene.frame_end = frame_end
 
             subject.animation_data.action = anim.action
+
+            # Bake any physics simulations etc.
+            self.prepare_for_rendering(context, subject)
             self.render_frames(context, renderpaths, frame_start, frame_range, subject)
 
     def execute(self, context):
