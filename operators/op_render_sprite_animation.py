@@ -82,6 +82,38 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
                 print("Rotating by arc:", arc)
                 camera_track.rotation_euler[2] += arc
 
+    # Function to bake cloth simulation
+    def bake_cloth_simulation(self, context, objs):
+        for obj in objs:
+
+            if obj.hide_render:
+                print(f"Skipping baking for: {obj.name} as it is not enabled for rendering.")
+                continue
+
+            # Make sure the object is the active object and is selected
+            bpy.context.view_layer.objects.active = obj
+            obj.select_set(True)
+            
+            for modifier in obj.modifiers:
+                if modifier.type == 'CLOTH':
+                    print(f"Baking cloth simulation for: {obj.name}")
+                    # Override the context for baking
+                    override = context.copy()
+                    override['active_object'] = obj
+                    override['object'] = obj
+                    override['point_cache'] = modifier.point_cache
+                    bpy.ops.ptcache.bake(override, bake=True)
+                    break  # Assuming we only have one cloth modifier per object
+
+            # Deselect the object after baking
+            obj.select_set(False)
+
+    def prepare_for_rendering(self, context, subject):
+        # Check the subject and its siblings for cloth modifiers and bake if necessary
+        if subject:
+            objs_to_bake = [subject] + [obj for obj in subject.children if obj.type == 'MESH']
+            self.bake_cloth_simulation(context, objs_to_bake)
+
     # render the animation or sprites for each animation
     # these animations are stored in scene.mk_sprites_subject_panel_properties
     def render_animations(self, context, renderpaths, subject):
@@ -89,6 +121,9 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
 
         # render each animation
         for anim in mk_subject_props.obj_actions:
+            # Bake any physics simulations etc.
+            self.prepare_for_rendering(context, subject)
+
             frame_start = int(anim.action.frame_range[0])
             frame_end = int(anim.action.frame_range[1])
             frame_step = context.scene.frame_step
