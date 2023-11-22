@@ -34,11 +34,12 @@ class MK_SPRITES_OP_export_bevy_image_json(bpy.types.Operator):
 
         animations = {}
         n = 0
-        for obj_rot in range(active_image.object_angles):
-            for action_obj in active_image.object_actions:
+        for action_obj in active_image.object_actions:
+            for obj_rot in range(active_image.object_angles):
                 if action_obj is None or action_obj.action is None:
                     continue
 
+                print(f"Setting up action {action_obj.action.name}, r:{obj_rot},n:{n}")
                 action_name = action_obj.action.name + "_" + str(obj_rot)
                 animations[action_name] = {
                     "mode": "Repeat",
