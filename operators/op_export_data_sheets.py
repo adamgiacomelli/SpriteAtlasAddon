@@ -39,10 +39,11 @@ class MK_SPRITES_OP_export_bevy_image_json(bpy.types.Operator):
                 if action_obj is None or action_obj.action is None:
                     continue
 
-                print(f"Setting up action {action_obj.action.name}, r:{obj_rot},n:{n}")
+                action_mode =  action_obj.action.get("mode", "Repeat X")
+                print(f"Setting up action {action_obj.action.name}, r:{obj_rot},n:{n}, mode: {action_mode}")
                 action_name = action_obj.action.name + "_" + str(obj_rot)
                 animations[action_name] = {
-                    "mode": "Repeat",
+                    "mode": action_mode,
                     "fps": context.scene.render.fps,
                     "size_x": mk_render_props.resolution_x,
                     "size_y": mk_render_props.resolution_y,

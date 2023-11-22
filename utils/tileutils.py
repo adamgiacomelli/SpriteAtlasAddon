@@ -58,6 +58,7 @@ def TilePathsIntoImage(spritesheet_name_string, image_path_list, width, height):
     print("Spritesheet res: %s %s size(%s, %s)" % (spritesheet.resolution[0],spritesheet.resolution[1], spritesheet.size[0], spritesheet.size[1]))
     for i in range(len(image_path_list)):
 
+        print(f"Generating spritesheet, processing image no. {i}/{len(image_path_list)}")
         # locals
         path = image_path_list[i]
         img = None
