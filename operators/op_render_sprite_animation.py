@@ -110,7 +110,8 @@ class MK_SPRITES_OP_render_sprite_animation(bpy.types.Operator):
                     override['active_object'] = obj
                     override['object'] = obj
                     override['point_cache'] = modifier.point_cache
-                    bpy.ops.ptcache.bake(override, bake=True)
+                    with bpy.context.temp_override(**override):
+                        bpy.ops.ptcache.bake(bake=True)
                     break  # Assuming we only have one cloth modifier per object
 
             # Deselect the object after baking

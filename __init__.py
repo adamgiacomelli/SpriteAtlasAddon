@@ -5,15 +5,15 @@ from . operators import op_render_sprite_animation, op_export_data_sheets
 from . ui import ui_export_panel, ui_render_panel, ui_subject_panel
 
 bl_info = {
-    "name": "Sprite Atlas Tools",
-    "author": "Martin Kearl",
-    "version": (0, 1),
+    "name": "Sprite Atlas Generator",
+    "author": "Adam Giacomelli",
+    "version": (1, 1),
     "blender": (3, 0, 0),
-    "location": "View3D > UI > Sprites",
-    "description": "Tools for rendering and exporting sprite sheets",
+    "location": "3D Viewport > Side panel -> Sprites",
+    "description": "Generate Spritesheet data",
     "warning": "",
-    "doc_url": "https://github.com/Mattline1/SpriteAtlasAddon",
-    "category": "Export",
+    "doc_url": "",
+    "category": "Sprite Tools",
 }
 
 classes = (
