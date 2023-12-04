@@ -9,7 +9,7 @@ from .ui_subject_panel import MK_SPRITES_action_item
 
 from ..utils.xmlutils import GetMonoXMLHeader, XMLIndent, ExportXml
 from ..utils.tileutils import GetTilePos
-from ..operators.op_export_data_sheets import MK_SPRITES_OP_export_image_json, MK_SPRITES_OP_export_image_xml, MK_SPRITES_OP_export_bevy_image_json
+from ..operators.op_export_data_sheets import MK_SPRITES_OP_export_image_json, MK_SPRITES_OP_export_image_xml, MK_SPRITES_OP_export_bevy_image_json, MK_SPRITES_OP_export_godot_sprite_frames
 
 def update_active_image(self, context):
     export_props = context.scene.mk_sprites_export_panel_properties
@@ -68,6 +68,11 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
         name="Export Image",
         description="Example Tooltip",
         default=True,
+    )
+    export_godot_sprite_frames: BoolProperty(
+        name="Export Godot Sprite Frames .tres",
+        description="Example Tooltip",
+        default=False,
     )
     export_bevy_json: BoolProperty(
         name="Export Bevy JSON",
@@ -217,6 +222,7 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
 
         col.prop(self, "export_json")
         col.prop(self, "export_bevy_json")
+        col.prop(self, "export_godot_sprite_frames")
         #col.prop(self, "export_asesprite json")
 
         col.prop(self, "export_xml")
@@ -238,6 +244,9 @@ class MK_SPRITES_OP_export_image_data(bpy.types.Operator):
 
         if self.export_bevy_json:
             bpy.ops.mk_sprites.export_bevy_image_json(filepath = self.filepath)
+
+        if self.export_godot_sprite_frames:
+            bpy.ops.mk_sprites.export_godot_sprite_frames(filepath = self.filepath)
 
         if self.export_xml or self.export_mono:
             bpy.ops.mk_sprites.export_image_xml(filepath = self.filepath, use_mono = self.export_mono)
